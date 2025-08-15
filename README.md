@@ -65,7 +65,7 @@
   
   Here’s a quick Power BI DAX pattern you can copy-paste and adapt to your needs:
 
-# 🎨 Generic Template for AQI Color:
+### 🎨 Generic Template for AQI Color:
   DAX
   
     AQI Color TEMPLATE =
@@ -84,45 +84,45 @@
   💡 Simply copy this measure and replace COLUMN_NAME with the air quality column you want to check — for example:
   
   pm2_5
-  
   co
-  
   no2
 
-🎨 Generic Template for AQI Suggestion:
+### 🎨 Generic Template for AQI Suggestion:
 DAX
-  AQI Suggestion TEMPLATE =
-  VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
-  RETURN
-  SWITCH(
-  TRUE(),
-  AQI <= 50, "Air is clean and healthy",
-  AQI <= 100, "Acceptable air quality, stay active",
-  AQI <= 150, "Sensitive groups should reduce outdoor time",
-  AQI <= 200, "Limit prolonged outdoor exertion",
-  AQI <= 300, "Avoid outdoor activity if possible",
-  "Stay indoors, wear a mask if outside"
-  )
 
-🎨 Generic Template for AQI Status:
+	AQI Suggestion TEMPLATE =
+	VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
+	RETURN
+	SWITCH(
+	TRUE(),
+	AQI <= 50, "Air is clean and healthy",
+	AQI <= 100, "Acceptable air quality, stay active",
+	AQI <= 150, "Sensitive groups should reduce outdoor time",
+	AQI <= 200, "Limit prolonged outdoor exertion",
+	AQI <= 300, "Avoid outdoor activity if possible",
+	"Stay indoors, wear a mask if outside"
+	)
+
+### 🎨 Generic Template for AQI Status:
 DAX
-AQI Status TEMPLATE =
-VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
-RETURN
-SWITCH(
-TRUE(),
-AQI <= 50, "Good",
-AQI <= 100, "Moderate",
-AQI <= 150, "Unhealthy for Sensitive",
-AQI <= 200, "Unhealthy",
-AQI <= 300, "Very Unhealthy",
-"Hazardous"
-)
+
+	AQI Status TEMPLATE =
+	VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
+	RETURN
+	SWITCH(
+	TRUE(),
+	AQI <= 50, "Good",
+	AQI <= 100, "Moderate",
+	AQI <= 150, "Unhealthy for Sensitive",
+	AQI <= 200, "Unhealthy",
+	AQI <= 300, "Very Unhealthy",
+	"Hazardous"
+	)
 
 ✅ Again, just replace COLUMN_NAME with the pollutant of interest.
 
-💡 Quick Tip:
+# 💡 Quick Tip:
 Keep these generic DAX measures as templates — so when you want to add AQI visualizations for new pollutants like so2, no2, or o3, you only need to copy-paste and tweak one column name.
 
-🎉 Conclusion
+# 🎉 Conclusion
 By integrating WeatherAPI into Power BI, you can create a dynamic weather dashboard with live data, then enrich it with custom AQI visualizations — all in a few easy steps. With these reusable DAX measures, your dashboard stays scalable, maintainable, and easy to enhance as your requirements grow.
