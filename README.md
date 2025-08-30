@@ -1,128 +1,94 @@
-# Live Weather Dashboard with Power BI
-# How to Develop a Power BI Dashboard with WeatherAPI
-  Power BI is a fantastic tool for visualizing data — and you can easily integrate live weather data into your reports too. In this blog, we’ll walk you through the process of building a real-time weather dashboard powered by WeatherAPI, and then we’ll add some Air   Quality Index (AQI) indicators for a richer dashboard experience.
+# Fitness Dashboard with Power BI
+
 
 # 🎯 Why WeatherAPI?
   WeatherAPI.com is a simple and powerful service that returns live, historical, and forecast weather data — perfect for Power BI. The data is available in JSON format, making it easy to process and transform.
 
 # 🛠️ Prerequisites
-  ✅ A free or paid account on WeatherAPI.com
   
   ✅ Power BI Desktop installed
   
   ✅ Basic Power BI data model knowledge
+  
+# 🪜 Steps
+### ✅ Import fitness and membership data
+Bringing in user profiles, activity logs, membership details, etc.
 
-# 🔑 Step 1: Get Your WeatherAPI Key
-  Sign up at WeatherAPI.com, then copy your API key.
-  
-  You’ll use this key to authenticate API calls.
+### ✅ Create different KPIs using DAX measures
+Calculating metrics like BMR, TDEE, BMI, Weight Loss Calories, Active vs Expired Members, Renewal Rate, etc.
 
-# 🌐 Step 2: Build the API URL
-  For current weather data, use:
-  
-  https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=CITY_NAME
+### ✅ Track membership progress with dates
+Using date columns (Start Date, Expiry Date, Renewal Date) to calculate active vs expired membership status.
 
-# 🧠 Step 3: Connect Power BI to WeatherAPI
-  Open Power BI Desktop.
-  
-  Click Get Data → Web.
-  
-  Enter your WeatherAPI URL.
-  
-  Click OK.
+### ✅ Visualize active vs expired members
+Pie chart / bar chart showing membership distribution.
 
-# 🧹 Step 4: Transform the Data
-  Power BI will show a preview in the Power Query Editor:
-  
-  Expand the current record.
-  
-  Expand sub-records like condition or air_quality.
-  
-  Rename columns for clarity.
-  
-  Click Close & Apply.
+Could even include trend over time.
 
-# 📊 Step 5: Build Your Dashboard
-  Add:
-  
-  ✅ Cards for temperature, humidity, etc.
-  
-  ✅ Gauges for wind speed.
-  
-  ✅ Charts for daily variations.
-  
-  And you can also set up filters/slicers for different cities.
+### ✅ Build custom visuals like an SVG progress bar
+Showing progress toward weight goal, calorie target, or membership completion percentage.
 
-# 🎨 Step 6: Styling & Interactivity
-  Insert icons representing the current weather.
+# Few important Measures:
+### 🎨 SVG BarChart for Membership Period
   
-  Plot the map visual with city locations.
-  
-  Allow your users to select cities dynamically.
-
-# ⚡ Step 7: Adding AQI Indicators with Reusable Measures
-  You can easily incorporate Air Quality Index (AQI) data into your report using the current.air_quality part of the WeatherAPI response.
-  
-  Here’s a quick Power BI DAX pattern you can copy-paste and adapt to your needs:
-
-### 🎨 Generic Template for AQI Color:
-  DAX
-  
-    AQI Color TEMPLATE =
-    VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
-    RETURN
-    SWITCH(
-    TRUE(),
-    AQI <= 50, "#43d946",
-    AQI <= 100, "#fff570",
-    AQI <= 150, "#ff9800",
-    AQI <= 200, "#d99343",
-    AQI <= 300, "#ff5b0f",
-    "#d95243"
-    )
-  
-  💡 Simply copy this measure and replace COLUMN_NAME with the air quality column you want to check — for example:
-  
-  pm2_5
-  co
-  no2
-
-### 🎨 Generic Template for AQI Suggestion:
-DAX
-
-	AQI Suggestion TEMPLATE =
-	VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
+	SVG_BarChart = 
+	VAR ProgressValue = [ProgressPercentage]
+	VAR BarWidth = 260
+	VAR ProgressWidth = BarWidth * ProgressValue
+	VAR Select_Color = SELECTEDVALUE(ColorCodes[Codes])
+	VAR SVG_Data_URL = "data:image/svg+xml;utf8,"
+	VAR SVG =
+		"<svg width='400' height='40' xmlns='http://www.w3.org/2000/svg'>" &
+		"<rect x='10' y='10' width='" & BarWidth & "' height='20' rx='10' ry='10' fill='#555' />" &
+		"<rect x='10' y='10' width='" & ProgressWidth & "' height='20' rx='10' ry='10' fill='" & Select_Color & "' />" &
+		"<text x='330' y='25' font-family='Arial' font-size='20' font-weight='bold' fill='#E6E6E6' text-anchor='end' alignment-baseline='middle'>" &
+			ROUND(ProgressValue*100, 0) & "%" &
+		"</text>" &
+		"</svg>"
 	RETURN
-	SWITCH(
-	TRUE(),
-	AQI <= 50, "Air is clean and healthy",
-	AQI <= 100, "Acceptable air quality, stay active",
-	AQI <= 150, "Sensitive groups should reduce outdoor time",
-	AQI <= 200, "Limit prolonged outdoor exertion",
-	AQI <= 300, "Avoid outdoor activity if possible",
-	"Stay indoors, wear a mask if outside"
-	)
+		SVG_Data_URL & SVG
 
-### 🎨 Generic Template for AQI Status:
-DAX
+### 🎨 BMI:
 
-	AQI Status TEMPLATE =
-	VAR AQI = ROUND(SELECTEDVALUE('Current'[current.air_quality.COLUMN_NAME]),0)
+	BMI = 
+	VAR _Weight = SELECTEDVALUE('Weight'[Weight])   // in kg
+	VAR _Height = SELECTEDVALUE(Height[Height])   // in cm
 	RETURN
-	SWITCH(
-	TRUE(),
-	AQI <= 50, "Good",
-	AQI <= 100, "Moderate",
-	AQI <= 150, "Unhealthy for Sensitive",
-	AQI <= 200, "Unhealthy",
-	AQI <= 300, "Very Unhealthy",
-	"Hazardous"
-	)
+	    DIVIDE(_Weight, (_Height / 100) ^ 2)
+	
+### 🎨 BMR:
+	BMR = 
+	VAR _Gender = SELECTEDVALUE('Members'[Gender])   // "Male" or "Female"
+	VAR _Age    = SELECTEDVALUE(Age[Age])      // in years
+	VAR _Height = SELECTEDVALUE(Height[Height])   // in cm
+	VAR _Weight = SELECTEDVALUE('Weight'[Weight])   // in kg
+	VAR Result =
+	    SWITCH(
+	        TRUE(),
+	        _Gender = "Male",   10 * _Weight + 6.25 * _Height - 5 * Age + 5,
+	        _Gender = "Female", 10 * _Weight + 6.25 * _Height - 5 * Age - 161,
+	        BLANK()
+	    )
+	RETURN Result
+ ### 🎨 TDEE:
+	TDEE = 
+	VAR BMRValue = [BMR]
+	VAR ActivityFactor =
+	    SELECTEDVALUE(Slider_Activity[ActivityFactor])
+	RETURN
+	    BMRValue * ActivityFactor
 
-✅ Again, just replace COLUMN_NAME with the pollutant of interest.
 
 # 💡 Quick Tip:
-Keep these generic DAX measures as templates — so when you want to add AQI visualizations for new pollutants like so2, no2, or o3, you only need to copy-paste and tweak one column name.
+Keep these generic DAX measures as templates for reuse.
 
 # 🎉 Conclusion
-By integrating WeatherAPI into Power BI, you can create a dynamic weather dashboard with live data, then enrich it with custom AQI visualizations — all in a few easy steps. With these reusable DAX measures, your dashboard stays scalable, maintainable, and easy to enhance as your requirements grow.
+This Power BI Fitness Dashboard is a great project to learn how to:
+
+🔆 Write DAX measures
+
+🔆 Track KPIs for a fitness/gym business
+
+🔆 Create interactive dashboards with custom visuals
+
+🔆 Present your work in a professional way
