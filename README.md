@@ -1,9 +1,5 @@
 # Fitness Dashboard with Power BI
 
-
-# 🎯 Why WeatherAPI?
-  WeatherAPI.com is a simple and powerful service that returns live, historical, and forecast weather data — perfect for Power BI. The data is available in JSON format, making it easy to process and transform.
-
 # 🛠️ Prerequisites
   
   ✅ Power BI Desktop installed
